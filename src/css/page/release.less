@@ -1,0 +1,117 @@
+@import url(../common.less);
+@media (max-width:992px) {
+  select,option,input,h4,h5,span,label,span,li,button{font-size: @fontSizeM;}
+}
+@media (min-width:992px) {
+  select,input,h4,h5,span,label,span,li,button{font-size: @fontSizeL;}
+}
+.select {
+  border-color: @gray - #222222;
+  padding: 4px 6px 6px 4px;
+  outline: none;
+  border-radius: 3px;
+  &:focus {.box-shadow-focus;}
+  &:focus {
+    border-color: #467EAD;
+  }
+  option {
+    width: 100%;
+  }
+}
+.error {
+  display: none;
+  color: red;
+  position: absolute;
+  @media (max-width:992px) {right: 0;top: 14px;}
+  @media (min-width:992px) {right: 60px;top: 24px;}
+  
+}
+
+
+form {
+  .input-box {
+    position: relative;
+    @media (max-width:992px) {
+      padding: 10px 10px;
+    }
+    @media (min-width:992px) {
+      padding: 20px 30px;
+    }
+    border-bottom: 1px solid @borderColor;
+    h4 {
+      @media (min-width:992px) {
+        padding-left: 100px;
+      }
+      text-align: left;
+      font-weight: bold;
+      color: @dark - #444444;
+      padding: 0 10px;
+    }
+    input[type="text"] {
+      .input-text;
+      &:focus {.box-shadow-focus;}
+    }
+    select {
+      .select;
+    }
+    .sex {
+      input {
+        margin: 2px 6px 0 0;
+      }
+    }
+    textarea {
+      .textarea;
+      &:focus {.box-shadow-focus;}
+    }
+    .time-box {
+      position: relative;
+      padding: 0;
+    }
+    #mail,#qq {
+      ime-mode:disabled;
+    }
+  }
+  .skill-content {
+    padding: 0;
+  }
+  .add-skill-box {
+    position: relative;
+    width: 70%;
+    height: 30px;
+    border: 1px dashed @dark;
+    border-radius: 3px;
+    margin-top: 10px;
+    cursor: pointer;
+    &:before {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 15px;
+      left: 0;
+      width: 100%;
+      height: 0;
+      border-bottom: 1px dashed @dark;
+    }
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 0;
+      height: 100%;
+      border-left: 1px dashed @dark;
+    }
+  }
+  .border-top {
+    border-top: 1px solid @borderColor;
+  }
+}
+#submit {
+  .button;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}

@@ -1,0 +1,161 @@
+@import url(../common.less);
+.register {
+  .container {
+    padding-top: 20px;
+  }
+}
+@media (max-width:992px) {
+  select,option,input,h4,h5,span,label,span,li,button{font-size: @fontSizeM;}
+}
+@media (min-width:992px) {
+  select,input,h4,h5,span,label,span,li,button{font-size: @fontSizeL;}
+}
+.select {
+  border-color: @gray - #222222;
+  padding: 4px 6px 6px 4px;
+  outline: none;
+  border-radius: 3px;
+  &:focus {.box-shadow-focus;}
+  option {
+    width: 100%;
+  }
+}
+.label {
+  padding-right: 20px;
+  padding-top: 4px;
+  font-weight: normal;
+}
+.span {
+  text-align: center;
+  display: block;
+  background-color: @blue + #222222;
+  color: @white;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.skill-active {background-color: @blue + #444444 !important;color: @white;}
+form {
+  padding-top: 30px;
+  .user-img-m {
+    @media (max-width:992px) {
+      .clearfix;
+    }
+    h4 {
+      padding-left: 8px;
+      font-weight: bold;
+      color: @dark - #666666;
+      @media (min-width:992px) {
+        display: none;
+      }
+    }
+    .user-img {
+      @media (min-width:992px) {
+        float: left;
+        left: 30px;
+      }
+      @media (max-width:992px) {
+        float: left;
+        bottom: 20px;
+      }
+      position: relative;
+      width: 160px;
+      height: 160px;
+      border-radius: 5px;
+      .img-mask {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        opacity: .4;
+        border-radius: 5px;
+      }
+      i {
+        position: absolute;
+        left: 60px;
+        top: 35px;
+        font-size: 40px;
+        color: @white;
+      }
+      h5 {
+        width: 100%;
+        position: absolute;
+        left: 0;
+        bottom: 30px;
+        color: @white;
+        text-align: center;
+      }
+      input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 160px;
+        height: 160px;
+      }
+      img {
+        border-radius: 3px;
+        display: none;
+        border: none;
+      }
+    }
+  }
+  .user-text {
+    overflow: hidden;
+     @media (min-width:992px) {
+      margin-left: 230px;
+    }
+    .input-box {
+      position: relative;
+      @media (max-width:992px) {
+        padding: 10px 10px;
+      }
+      @media (min-width:992px) {
+        padding: 20px 30px;
+      }
+      border-bottom: 1px solid @borderColor;
+      h4 {
+        text-align: left;
+        font-weight: bold;
+        color: @dark - #444444;
+        padding: 0 10px;
+      }
+      input[type="text"] {
+        .input-text;
+        &:focus {.box-shadow-focus;}
+      }
+      select {
+        .select;
+      }
+      .sex {
+        input {
+          margin: 2px 6px 0 0;
+        }
+        label {
+          .label;
+        }
+      }
+      textarea {
+        .textarea;
+        &:focus {.box-shadow-focus;}
+      }
+    }
+    .border-top {
+      border-top: 1px solid @borderColor;
+    }
+  }
+}
+.skill-box {
+  position: relative;
+  padding: 0;
+}
+#submit {
+  .button;
+  text-align: center;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
