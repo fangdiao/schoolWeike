@@ -1,535 +1,287 @@
 require("../components/npm.js");
 require("../../css/page/user.less");
-require("../../css/page/release.less");
 const content_path = require("../components/content_path");
 var user_str = require("../../view/user.html");
-//time组件
-const time = require("../components/time.js");
-const timeGo = new time();
-//skill技能组件
-const skill_box_str = require("../../view/skill_box.html");
-const skillBox = require("../components/skill_box.js");
-const skill_box = new skillBox();
 
-$("header").after(user_str);
 
-(function($){
-	var user = {
-		//用户类型
-		userType:"",
-		//token
-		token:"",
-		//老师表单存储对象
-    teacher_form:{
-      username: "",
-      sex:"",
-      image: "",
-      university: "",
-      academy: "",
-      rank: "",
-      qq: ""
-    },
-    //学生表单存储对象
-    student_form:{
-      username: "",
-      sex: "",
-      image: "",
-      university: "",
-      academy: "",
-      major: "",
-      edu_background: "",
-      entry_university: "",
-      leave_university: "",
-      skills: [],
-      experience: "",
-      self_feel: "",
-      qq: ""
-    },
-    iniStudentForm:function(){
-    	let that = this;
-    	that.student_form.username = $('.user-stuOwnerData tr:eq(0) td:eq(1)').html();
-  		that.student_form.edu_background = $('.user-stuOwnerData tr:eq(1) td:eq(1)').html();
-  		that.student_form.sex = $('.user-stuOwnerData tr:eq(2) td:eq(1)').html();
-  		that.student_form.image = $('.user-stuOwnerData tr:eq(0) td:eq(1)').html();
-  		that.student_form.university = $('.user-stuOwnerData tr:eq(3) td:eq(1)').html();
-  		that.student_form.academy = $('.user-stuOwnerData tr:eq(4) td:eq(1)').html();
-  		that.student_form.major = $('.user-stuOwnerData tr:eq(5) td:eq(1)').html();
-  		that.student_form.entry_university = $('.user-stuOwnerData tr:eq(6) td:eq(1)').html();
-  		that.student_form.leave_university = $('.user-stuOwnerData tr:eq(7) td:eq(1)').html();
-  		that.student_form.experience = $('.user-stuOwnerData tr:eq(9) td:eq(1)').html();
-  		that.student_form.self_feel = $('.user-stuOwnerData tr:eq(11) td:eq(1)').html();
-  		that.student_form.qq = $('.user-stuOwnerData tr:eq(10) td:eq(1)').html();
-  		let skillsData = $('.user-stuOwnerData tr:eq(8) td:eq(1)').html();
-  		let skillArray = skillsData.split(",");
-  		let skillArrayLength = skillArray.length;
-  		for( let i = 0; i < skillArrayLength; i ++){
-  			that.student_form.skills[i] = skillArray[i];	
-  		}
-    },
-    function(){
-    	let that = this;
-    	that.teacher_form.username = $('.user-teaOwnerData tr:eq(0) td:eq(1)').html();
-  		that.teacher_form.sex = $('.user-teaOwnerData tr:eq(1) td:eq(1)').html();
-  		that.teacher_form.image = $('.user-teaOwnerData tr:eq(0) td:eq(1)').html();
-  		that.teacher_form.university = $('.user-teaOwnerData tr:eq(2) td:eq(1)').html();
-  		that.teacher_form.academy = $('.user-teaOwnerData tr:eq(3) td:eq(1)').html();
-  		that.teacher_form.rank = $('.user-teaOwnerData tr:eq(4) td:eq(1)').html();
-  		that.teacher_form.qq = $('.user-teaOwnerData tr:eq(5) td:eq(1)').html();
-    },
-    //初始化
-		initial:function(){
-			timeGo.action();
-   		skill_box.action();
-			this.eventBind();
-			var that = this;
-			$(".user-name").html(sessionStorage.user_name);
-			//获取token
-			that.token = localStorage.token;
-			that.userType = sessionStorage.userType;
-			
-		  let navList = $('.user-navUl > li');
-		  let sectionDiv = $('.user-section > div');
-		  
-		  let navlistLength = navList.length;
-		  
-		  for(let i = 0; i < navlistLength; i ++){
-		  	
-		  	navList[i].index = i;
-				navList[i].onclick = function(){
-					for(let j = 0;j < navlistLength; j ++){
-						navList[j].className = "";
-						sectionDiv[j].className = "";	
-					}
-					this.className = "showLiList";
-					sectionDiv[this.index].className = "showSectionDiv";
-				};
-		  };
-		  //根据用户类型初始化
-		  if(that.token){
-		  	if(that.userType === "teacher"){
-		  		that.iniTeacherForm();
-		  		let weike = JSON.stringify(that.teacher_form);
-					localStorage.setItem("weike",weike);
-					console.log(weike)
-		  		//消息中心
-		  		$.ajax({
-		  			type:"GET",
-		  			url:content_path + "",
-		  			contentType: 'application/json;charset=UTF-8',
-						beforeSend:function(request) {
-							request.setRequestHeader("Authorization", that.token);
-						},
-						data:"",
-						sync:true,
-						success:function(response){
-							if(response.ifSuccess){
-								let messageCenter = response.messageCenter;
-								let openProject = response.openProject;
-								let joinProject = response.joinProject;
-								let ownerMessage = response.ownerMessage;
-								
-								let messageLength = messageCenter.length;
-								let openProjectLength = openProject.length;
-								let joinProjectLength = joinProject.length;
-								let ownerMessageLength = ownerMessage.length;
-								//消息中心
-								if(messageLength === 0){
-									//无消息
-								}
-								else{
-									for( let i = 0; i < messageLength; i ++){
-										let module =  `<tr>
-												    				<td>${messageCenter[i].name}</td>
-												    				<td>${messageCenter[i].message}</td>
-												    				<td>${messageCenter[i].date}</td>
-												    				<td>${messageCenter[i].connect}</td>
-												    				<td>
-												    					<button name="show">查看</button><button name="delete">删除</button>
-												    				</td>
-												    			</tr>`;
-										$('.user-messageCenter').append(module);
-									}
-								}
-								//发起的项目
-								if(openProjectLength === 0){
-									//无消息
-								}
-								else{
-									for( let i = 0; i < openProjectLength; i ++){
-										let module = `<tr>
-												    				<td>${openProject[i].name}</td>
-												    				<td>${openProject[i].type}</td>
-												    				<td>${openProject[i].introduction }</td>
-												    				<td>${openProject[i].beginDate}~${openProject[i].endDate}</td>
-												    				<td>${openProject[i].peopleRequire}</td>
-												    				<td><button name="edit">编辑</button><button name="delete">删除</button></td>
-												    			</tr>`;
-										$('.user-openProject').append(module);
-									}
-								}
-								//参与的项目
-								if(joinProjectLength === 0){
-									//无消息
-								}
-								else{
-									for( let i = 0; i < joinProjectLength; i ++){
-										let module = `<tr>
-												    				<td>${joinProject[i].name}</td>
-												    				<td>${joinProject[i].type}</td>
-												    				<td>${joinProject[i].introduction }</td>
-												    				<td>${joinProject[i].beginDate}~${openProject[i].endDate}</td>
-												    				<td>${joinProject[i].peopleRequire}</td>
-												    				<td><button name="edit">编辑</button><button name="delete">删除</button></td>
-												    			</tr>`;
-										$('.user-joinProject').append(module);
-									}
-								}
-								
-								//个人资料
-								if(ownerMessageLength === 0){
-									//无消息
-								}
-								else{
-									for( let i = 0; i < ownerMessageLength; i ++){
-										let module = `<tr><td>姓名</td><td>${ownerMessage[i].name}</td></tr>
-													    			<tr><td>性别</td><td>${ownerMessage[i].sex}</td></tr>
-													    			<tr><td>所在院校</td><td>${ownerMessage[i].university}</td></tr>
-													    			<tr><td>所在院系</td><td>${ownerMessage[i].academy}</td></tr>
-													    			<tr><td>职称</td><td>${ownerMessage[i].rank}</td></tr>
-													    			<tr><td>QQ</td><td>${ownerMessage[i].qq}</td></tr>
-													    			<tr><td colspan="2"><button class="user-update">修改/完善</button></td>
-													    		</tr>`;
-										$('.user-teaOwnerData').append(module);
-									}
-								}
-							}
-						},
-						error:function(err){
-							//alert("初始化失败");
-						}
-		  		});
-		  		//个人资料
-		  		$(".user-teaOwnerData").show();
-		  	}
-		  	else if(that.userType === "student"){
-		  		
-		  		that.iniStudentForm();
-		  		let weike = JSON.stringify(that.student_form);
-					console.log(weike)
-					localStorage.setItem("weike",weike);
-		  		//消息中心
-		  		$.ajax({
-		  			type:"GET",
-		  			url:"",
-		  			contentType: 'application/json;charset=UTF-8',
-						beforeSend:function(request) {
-							request.setRequestHeader("Authorization", that.token);
-						},
-						data:"",
-						sync:true,
-						success:function(response){
-							let messageCenter = response.messageCenter;
-							let openProject = response.openProject;
-							let joinProject = response.joinProject;
-							let ownerMessage = response.ownerMessage;
-							
-							let messageLength = messageCenter.length;
-							let openProjectLength = openProject.length;
-							let joinProjectLength = joinProject.length;
-							let ownerMessageLength = ownerMessage.length;
-							//消息中心
-							if(messageLength === 0){
-								//无消息
-							}
-							else{
-								for( let i = 0; i < messageLength; i ++){
-									let module =  `<tr>
-											    				<td>${messageCenter[i].name}</td>
-											    				<td>${messageCenter[i].message}</td>
-											    				<td>${messageCenter[i].date}</td>
-											    				<td>${messageCenter[i].connect}</td>
-											    				<td>
-											    					<button name="show">查看</button><button name="delete">删除</button>
-											    				</td>
-											    			</tr>`;
-									$('.user-messageCenter').append(module);
-								}
-							}
-							//发起的项目
-							if(openProjectLength === 0){
-								//无消息
-							}
-							else{
-								for( let i = 0; i < openProjectLength; i ++){
-									let module = `<tr>
-											    				<td>${openProject[i].name}</td>
-											    				<td>${openProject[i].type}</td>
-											    				<td>${openProject[i].introduction }</td>
-											    				<td>${openProject[i].beginDate}~${openProject[i].endDate}</td>
-											    				<td>${openProject[i].peopleRequire}</td>
-											    				<td><button name="edit">编辑</button><button name="delete">删除</button></td>
-											    			</tr>`;
-									$('.user-openProject').append(module);
-								}
-							}
-							//参与的项目
-							if(joinProjectLength === 0){
-								//无消息
-							}
-							else{
-								for( let i = 0; i < joinProjectLength; i ++){
-									let module = `<tr>
-											    				<td>${joinProject[i].name}</td>
-											    				<td>${joinProject[i].type}</td>
-											    				<td>${joinProject[i].introduction }</td>
-											    				<td>${joinProject[i].beginDate}~${openProject[i].endDate}</td>
-											    				<td>${joinProject[i].peopleRequire}</td>
-											    				<td><button name="edit">编辑</button><button name="delete">删除</button></td>
-											    			</tr>`;
-									$('.user-joinProject').append(module);
-								}
-							}
-							
-							//个人资料
-							if(ownerMessageLength === 0){
-								//无消息
-							}
-							else{
-								for( let i = 0; i < ownerMessageLength; i ++){
-									let module = `<tr><td>姓名</td><td>${ownerMessage[i].name}</td></tr>
-																<tr><td>学历</td><td>${ownerMessage[i].edu_background}</td></tr>
-											    			<tr><td>性别</td><td>${ownerMessage[i].sex}</td></tr>
-											    			<tr><td>所在院校</td><td>${ownerMessage[i].university}</td></tr>
-											    			<tr><td>所在院系</td><td>${ownerMessage[i].academy}</td></tr>
-											    			<tr><td>专业</td><td>${ownerMessage[i].major}</td></tr>
-											    			<tr><td>入学时间</td><td>${ownerMessage[i].entry_university}</td></tr>
-											    			<tr><td>毕业时间</td><td>${leave_university}</td></tr>
-											    			<tr><td>技能</td><td>${ownerMessage[i].skills}</td></tr>
-											    			<tr><td>项目经验</td><td>${ownerMessage[i].experience}</td></tr>
-											    			<tr><td>QQ</td><td>${ownerMessage[i].qq}</td></tr>
-											    			<tr><td>自我评价</td><td>${ownerMessage[i].self_feel}</td></tr>
-											    			<tr><td colspan="2"><button class="user-update">修改/完善</button></td></tr>`;
-									$('.user-stuOwnerData').append(module);
-								}
-							}
-						},
-						error:function(err){
-							//alert("初始化失败");
-						}
-		  		});
-		  		//个人资料
-		  		$(".user-stuOwnerData").show();
-		  	}
-		  }
+(function($) {
+	console.log(localStorage.weikeData)
+	var weikeData = localStorage.weikeData ? JSON.parse(localStorage.weikeData) : false;
+	var token =  'Bearer ' + JSON.parse(localStorage.weikeData).data.token;
+	var toRegister = `<div><a target='_blank' href='register.html'></a></div>`;
+	var noData = `<h5>暂无消息</h5>`
+	//菜单切换
+	var exchageMenu = {
+		info: function() {
+			$('header').after(user_str);
+			var li = $('.menu').find('li');
+			var contentBox = $('.content-box');
+			for (var i = 0; i < li.length; i ++) {
+				li.eq(i).attr('index', i);
+				contentBox.eq(i).attr('index', i);
+			}
 		},
-		//事件绑定
-		eventBind:function(){
-			let that = this;
-			let deleteMessageUrl = null;
-			if(that.userType === "teacher"){
-	  		deleteMessageUrl = content_path + '/'
-	  	}
-	  	else if(that.userType === "student"){
-	  		deleteMessageUrl = content_path + '/'
-	  	}
-			
-			$("body").on("click", ".user", function(event){
-				var target = event.target;
-				
-				//点击消息中心的查看后的关闭按钮
-				if(target.className === "show-out"){
-					$(".showContentContainer").css({
-						'display':'none'
-					});
-					$(".showContent").html("");
-				}
-				else if(target.id === "submit"){
-					if($("input[id = 'name'").val().length === 0){
-						$(".error:eq(1)").show();
+		change: function(index) {
+			$('.menu').find('li').eq(index).addClass('active').siblings().removeClass('active');
+			$('.content-box').eq(index).css('display', 'block').siblings().css('display', 'none');
+		},
+		action: function () {
+			this.info();
+			this.eventClick();
+		},
+		eventClick: function() {
+			var that = this;
+			$('body').on('click', '.menu', function(event) {
+				var target = $(event.target);
+				that.change(target.attr('index'));
+			});
+		}
+	}
+
+	//获取留言
+	var getMessage = {
+		get: function() {
+			var that = this;
+			var url = content_path + '/WeiKe/messageList';
+			if (localStorage.weikeData) {
+				$.ajax({
+					type: "get",
+					url: url,
+					beforeSend:function(request) {
+						request.setRequestHeader("Authorization", token);
+						request.setRequestHeader("Content-Type", 'application/json;charset=UTF-8');
+					},
+					success: function(response) {
+						that.messageToDom(response.data);
+					},
+					error: function(err){
+						console.log(err)
 					}
+				});
+			}
+		},
+		messageToDom: function(data) {
+			console.log(data)
+			var receive = $('.receive').find('ul'),
+					send = $('.send').find('ul'),
+					receiveData = data.fromMessages,
+					sendData = data.toMessages;
+			//发送的消息
+			if (receiveData.length > 0) {
+				for (var i = 0; i < receiveData.length; i ++) {
+					var module = `<li class="message-box clearfix">
+													<div class="clearfix">
+														<div class="left">
+															<p>${receiveData[i].fromName}</p>
+														</div>
+														<div class="right clearfix">
+															<p>${receiveData[i].content}</p>
+														</div>
+													</div>
+													<span data-id=${receiveData[i].id} class="delete"><i class="iconfont">&#xf0008;</i>删除</span>
+													<span>${this.getTime(receiveData[i].createDate)}</span>
+												</li>`
+					receive.append(module);
 				}
-				//点击个人资料的修改按钮
-				else if(target.className === "user-update"){
-					window.open("register.html", "_self", "scrollbars = 1");
+			} else {
+				receive.append(noData);
+			}
+			//接收的消息
+			if (sendData.length > 0) {
+				for (var i = 0; i < sendData.length; i ++) {
+					var module = `<li class="message-box clearfix">
+													<div class="clearfix">
+														<div class="left">
+															<p>${sendData[i].fromName}</p>
+														</div>
+														<div class="right clearfix">
+															<p>${sendData[i].content}</p>
+														</div>
+													</div>
+													<span data-id=${sendData[i].id} class="delete"><i class="iconfont">&#xf0008;</i>删除</span>
+													<span>${this.getTime(sendData[i].createDate)}</span>
+												</li>`
+					send.append(module);
+				}
+			} else {
+				send.append(noData);
+			}
+		},
+		//处理时间戳
+		getTime: function(data) {
+			var date = new Date(data);
+			Y = date.getFullYear() + '-';
+			M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+			D = date.getDate() + ' ';
+			return Y + M + D;
+		},
+		//删除
+		delete: function(data) {
+			var url = content_path + '/WeiKe/deleteMessage';
+			$.ajax({
+				type: 'post',
+				url: url,
+				data: JSON.stringify({'id': data}),
+				beforeSend: function(request) {
+					request.setRequestHeader("Authorization", token);
+					request.setRequestHeader("Content-Type", 'application/json;charset=UTF-8');
+				},
+				success: function(response) {
+					if (response.ifSuccess) {
+						var del = $('.delete');
+						for (var i = 0; i < del.length; i ++) {
+							if (del.eq(i).attr('data-id') === data) {
+								del.eq(i).parent().remove();
+							}
+						}
+					}
+				},
+				error: function(err){
+					console.log(err)
 				}
 			});
-			
-			
-			let messageCenterShow = $(".user-messageCenter button[name = 'show']");
-			let messageCenterDelete = $(".user-messageCenter button[name = 'delete']");
-			let openProjectEdit = $(".user-openProject button[name = 'edit']");
-			let openProjectDelete = $(".user-openProject button[name = 'delete']");
-			let joinProjectShow = $(".user-joinProject button[name = 'show']");
-			let joinProjectDelete = $(".user-joinProject button[name = 'delete']");
-			
-			let messageCenterTr = $(".user-messageCenter tr");
-			let openProjectTr = $(".user-openProject tr");
-			let joinProjectTr = $(".user-joinProject tr");
-			let messageCenterShowLength = messageCenterShow.length;	
-			let openProjectEditLength = openProjectEdit.length;
-			let joinProjectDeleteLength = joinProjectDelete.length;
-			
-			//个人中心查看按钮
-			for(let i = 0 ; i < messageCenterShowLength; i ++){
-				messageCenterShow[i].index = i;
-				messageCenterShow[i].onclick = function(){
-					for(let j = 0;j < messageCenterShowLength; j ++){
-						messageCenterTr[j].className = "";
-					}
-					messageCenterTr[this.index + 1].className = "messageCurrentShow";
-					$(".showContentContainer").show();
-					let showContentData = `<p>发件人 : ${$(".messageCurrentShow td:eq(0)").html()}</p>
-																<p>内容 : ${$(".messageCurrentShow td:eq(1)").html()}</p>
-																<p>时间 : ${$(".messageCurrentShow td:eq(2)").html()}</p>
-																<p>联系方式 : ${$(".messageCurrentShow td:eq(3)").html()}</p>`
-					$(".showContent").append(showContentData);
+		},
+		eventClick: function() {
+			var that = this;
+			$('body').on('click', '.message', function(event) {
+				var target = $(event.target);
+				if (target.attr('data-id')) {
+					console.log('1')
+					that.delete(target.attr('data-id'));
 				}
+			});
+		},
+		action: function() {
+			this.get();
+			this.eventClick();
+		}
+	}
+	//获取资料
+	var getInformation = {
+		info: function() {
+			var information = $('.information');
+			var noInformation = `<div class='no-information'>
+															<p>您还没填写个人资料</p>
+															<div>
+																<a href="register.html" target="_blank">现在去填写</a>
+															</div>
+														</div>`
+			if (!weikeData.data.isCompleted) {
+				information.html(noInformation);
+			} else {
+				this.get();
 			}
-			//个人中心查看删除
-			for(let i = 0 ; i < messageCenterShowLength; i ++){
-				messageCenterDelete[i].index = i;
-				messageCenterDelete[i].onclick = function(){
-					for(let j = 0;j < messageCenterShowLength; j ++){
-						messageCenterTr[j].className = "";
-					}
-					messageCenterTr[this.index + 1].className = "messageCurrentDelete";
-					var truthMessageDelete = window.confirm("单击“确定”删除,单击“取消”停止."); 
-					if (truthMessageDelete){ 
-						$(".messageCurrentDelete").remove();
-						//删除消息中心消息
-						$.ajax({
-							type: "POST",
-							url:deleteMessageUrl,
-							contentType: 'application/json;charset=UTF-8',
-							beforeSend:function(request) {
-								request.setRequestHeader("Authorization", that.token);
-							},
-							data:"",
-							sync:true,
-							success:function(response){
-								
-							},
-							error:function(err){
-								alert("删除失败");
-							}
-						});
-					}
-				}
+		},
+		get: function() {
+			var that = this;
+			if (weikeData.data.role === 'ROLE_STUDENT') {
+				$('.information ul').eq(0).css('display', 'block');
+				var url = content_path + '/WeiKe/student/personalData';
+			} else {
+				$('.information ul').eq(1).css('display', 'block');
+				var url = content_path + '/WeiKe/teacher/personalData';
 			}
-			
-			//项目历史参与项目查看按钮
-			for(let i = 0 ; i < joinProjectDeleteLength; i ++){
-				joinProjectShow[i].index = i;
-				joinProjectShow[i].onclick = function(){
-					for(let j = 0;j < joinProjectDeleteLength; j ++){
-						joinProjectTr[j].className = "";
+			if (localStorage.weikeData) {
+				$.ajax({
+					type: "GET",
+					url: url,
+					beforeSend:function(request) {
+						request.setRequestHeader("Authorization", token);
+						request.setRequestHeader("Content-Type", 'application/json;charset=UTF-8');
+					},
+					success: function(response) {
+						that.informtionToDom(response.data);
+					},
+					error: function(err){
+						console.log(err)
 					}
-					joinProjectTr[this.index + 1].className = "joinCurrentShow";
-					$(".showContentContainer").show();
-					let showHistoryData = `<p>项目名称 : ${$(".joinCurrentShow td:eq(0)").html()}</p>
-																<p>项目类型 : ${$(".joinCurrentShow td:eq(1)").html()}</p>
-																<p>项目简介 : ${$(".joinCurrentShow td:eq(2)").html()}</p>
-																<p>起止时间 : ${$(".joinCurrentShow td:eq(3)").html()}</p>
-																<p>人员要求 : ${$(".joinCurrentShow td:eq(3)").html()}</p>`
-					$(".showContent").append(showHistoryData);
-				}
+				});
 			}
-			
-			//项目历史参与项目删除按钮
-			for(let i = 0 ; i < joinProjectDeleteLength; i ++){
-				joinProjectDelete[i].index = i;
-				joinProjectDelete[i].onclick = function(){
-					for(let j = 0;j < joinProjectDeleteLength; j ++){
-						messageCenterTr[j].className = "";
-					}
-					joinProjectTr[this.index + 1].className = "joinCurrentDelete";
-					var truthJoinDelete = window.confirm("单击“确定”删除,单击“取消”停止."); 
-					if (truthJoinDelete){ 
-						$(".joinCurrentDelete").remove();
-						//删除消息中心消息
-						$.ajax({
-							type: "POST",
-							url:deleteMessageUrl,
-							contentType: 'application/json;charset=UTF-8',
-							beforeSend:function(request) {
-								request.setRequestHeader("Authorization", that.token);
-							},
-							data:"",
-							sync:true,
-							success:function(response){
-								
-							},
-							error:function(err){
-								alert("删除失败");
-							}
-						});
+		},
+		informtionToDom: function(data) {
+			localStorage.weikeUser = JSON.stringify(data);
+			for (var attr in data) {
+        if(!data[attr]) {
+          data[attr] = '无';
+        }
+      }
+			if (weikeData.data.role === 'ROLE_STUDENT') {
+				//skill
+				if (data.skills !== '无') {
+					var skill = $('.s-skill');
+					for (var i = 0; i < data.skills.length; i ++) {
+						var span = `<span>${data.skills[i]}</span>`
+						skill.append(span);
 					}
 				}
-			}
-			
-			//项目历史发起项目编辑按钮
-			for(let i = 0 ; i < openProjectEditLength; i ++){
-				openProjectEdit[i].index = i;
-				openProjectEdit[i].onclick = function(){
-					for(let j = 0;j < openProjectEditLength; j ++){
-						openProjectTr[j].className = "";
-					}
-					openProjectTr[this.index + 1].className = "openCurrentShow";
-					let openProjectData = $(".openCurrentShow td");
-					//获取起始时间
-					let dateValue = $(".openCurrentShow td:eq(3)").html().split("~");
-					//获取人员要求
-					let peopleRequire = $(".openCurrentShow td:eq(4)").html().split(",");
-					let peopleRequireLength = peopleRequire.length;
-					
-					for(let k = 0; k < peopleRequireLength; k ++){
-						let skills = `<span data-show-skill="${peopleRequire[k]}">${peopleRequire[k]}</span>`;
-						$(".user .skill-show").append(skills);
-					}
-					$(".user-projectUpdate").show();
-					$(".user-openProject").hide();
-					$(".user-joinProject").hide();
-					
-					$("input[id = 'name'").val($(".openCurrentShow td:eq(0)").html());
-					$("input[id = 'type'").val($(".openCurrentShow td:eq(1)").html());
-					$('.show-time:first-child').html(dateValue[0]);
-					$('.show-time:eq(1)').html(dateValue[1]);
-					$("textarea[id = 'summary'").val($(".openCurrentShow td:eq(2)").html());
-				}
-			}
-			
-			//项目历史发起项目删除按钮
-			for(let i = 0 ; i < openProjectEditLength; i ++){
-				openProjectDelete[i].index = i;
-				openProjectDelete[i].onclick = function(){
-					for(let j = 0;j < openProjectEditLength; j ++){
-						openProjectTr[j].className = "";
-					}
-					openProjectTr[this.index + 1].className = "openCurrentDelete";
-					var truthOpenDelete = window.confirm("单击“确定”删除,单击“取消”停止."); 
-					if (truthOpenDelete){ 
-						$(".openCurrentDelete").remove();
-						//删除消息中心消息
-						$.ajax({
-							type: "POST",
-							url:deleteMessageUrl,
-							contentType: 'application/json;charset=UTF-8',
-							beforeSend:function(request) {
-								request.setRequestHeader("Authorization", that.token);
-							},
-							data:"",
-							sync:true,
-							success:function(response){
-								
-							},
-							error:function(err){
-								alert("删除失败");
-							}
-						});
-					}
-				}
+				$('.s-username').html(data.username);
+				$('.s-sex').html(data.sex);
+				$('.s-edu').html(data.eduBackgroud);
+				$('.s-university').html(data.university);
+				$('.s-major').html(data.majorAndGrade);
+				$('.s-entry').html(data.entryUniversity);
+				$('.s-leave').html(data.leaveUniversity);
+				$('.s-qq').html(data.qq);
+				$('.s-exp').html(data.experience);
+				$('.s-self').html(data.selfFeel);
+				$('.s-level').html(data.level);
+				$('.s-email').html(data.email);
+			} else {
+				$('.t-username').html(data.username);
+				$('.t-sex').html(data.sex);
+				$('.t-university').html(data.university);
+				$('.t-academy').html(data.academy);
+				$('.t-rank').html(data.rank);
+				$('.t-qq').html(data.qq);
+				$('.t-email').html(data.email);
 			}
 		}
 	}
-	user.initial();
+	//获取项目
+	var getProject= {
+		getProject: function() {
+			var that = this;
+			if (weikeData.data.role === 'ROLE_STUDENT') {
+				var url = content_path + '/WeiKe/student/allProject';
+			} else {
+				var url = content_path + '/WeiKe/teacher/allProject';
+			}
+			if (localStorage.weikeData) {
+				$.ajax({
+					type: "GET",
+					url: url,
+					beforeSend:function(request) {
+						request.setRequestHeader("Authorization", token);
+						request.setRequestHeader("Content-Type", 'application/json;charset=UTF-8');
+					},
+					success: function(response) {
+						that.projectToDom(response.data);
+					},
+					error: function(err){
+						console.log(err)
+					}
+				});
+			}
+		},
+		projectToDom: function(data) {
+			console.log(data)
+			var projectHistory = $('.project-history ul');
+			projectHistory.empty();
+			if (data.length > 0) {
+				for (var i = 0; i < data.length; i ++ ) {
+					var module = `<li>
+													<a href="details.html?projectName=${data[i]}" target='_blank'>${data[i]}</a>
+												</li>`
+					projectHistory.append(module);
+				}
+			} else {
+				projectHistory.append(noData);
+			}
+		}
+	}
+ 	exchageMenu.action();
+	getInformation.info();
+	getProject.getProject();
+	getMessage.action();
+
 })(jQuery);

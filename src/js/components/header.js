@@ -7,7 +7,7 @@ var header_str = require("../../view/header.html");
     token:false,
     //判断是否存在token
     getToken:function () {
-      if (localStorage.token) {
+      if (localStorage.weikeData) {
         this.token = true;
       } else {
         this.token = false;
@@ -22,6 +22,10 @@ var header_str = require("../../view/header.html");
         $(".logged,.logged-m").css("display","none");
         $(".not-logged").css("display","block");
       }
+    },
+    //获取站内信
+    getMessage: function () {
+
     },
     action:function () {
       this.getToken();
@@ -42,9 +46,11 @@ var header_str = require("../../view/header.html");
           }
           //账号退出
         } else if ($(target).hasClass("cancel")) {
-          localStorage.removeItem("token");
+          localStorage.removeItem("weikeData");
+          localStorage.removeItem("weikeUser");
           sessionStorage.clear()
           _this.info();
+          location.reload(true);
         }
         /*点击head中的登录*/
         else if(target.id === 'sign-in-bt'){
@@ -54,7 +60,7 @@ var header_str = require("../../view/header.html");
           $('#common-login').css({
             'display': 'none'
           });
-          
+
           $('#common-register').css({
             'display': 'none'
           });
@@ -70,6 +76,13 @@ var header_str = require("../../view/header.html");
           $('#common-checkLogin').css({
             'display': 'none'
           });
+        } else if ($(target).hasClass('head-release')) {
+          var isCompleted = JSON.parse(localStorage.weikeData).data.isCompleted;
+          if (isCompleted) {
+            window.open("release.html", "_self", "scrollbars = 1");
+          } else {
+            window.open("register.html", "_self", "scrollbars = 1");
+          }
         }
       });
     }

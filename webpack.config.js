@@ -6,6 +6,13 @@ var HtmlWebpackPlugin = require("html-webpack-plugin");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 //自动添加css3样式前缀
 var autoprefixer = require("autoprefixer");
+
+//Webpack界面优化d
+var Dashboard = require('webpack-dashboard');
+var DashboardPlugin = require('webpack-dashboard/plugin');
+var dashboard = new Dashboard();
+
+
 module.exports = {
   context:path.resolve(__dirname,"src"),
   entry: {
@@ -14,10 +21,11 @@ module.exports = {
     release: "./js/page/release.js",     //发布项目页入口
     register: "./js/page/register.js",   //信息完善页入口
     user: "./js/page/user.js",           //用户资料入口
+    details: './js/page/details.js'           //项目详情页面入口
   },
   output: {
     path: path.resolve(__dirname,"dist"),              //输出的打包文件相对于这个路径
-    filename: "js/[name].js", //打包后的JS文件名字
+    filename: "js/[name].[hash].js", //打包后的JS文件名字
     chunkFilename:"js/[id].chunk.js"     //chunk生成配置
   },
   devServer:{
@@ -26,7 +34,7 @@ module.exports = {
     compress: true,
     port:8080,
     hot:true,
-    publicPath:"/dist", 
+    publicPath:"/dist",
   },
   module: {
     loaders: [
@@ -102,6 +110,13 @@ module.exports = {
       chunks:["vendors","user"],
       title: "user"
     }),
+    new HtmlWebpackPlugin({
+      filename: "details.html",
+      template: "./view/common.html",
+      inject: "body",
+      chunks:["vendors","details"],
+      title: "details"
+    }),
     new webpack.optimize.CommonsChunkPlugin({
       name: "vendors",                                      // 将公共模块提取，生成名为vendors的chunk
       chunks: ["index","search","release","register","user"], //提取哪些模块共有的部分
@@ -115,7 +130,8 @@ module.exports = {
           return [autoprefixer];
         }
       }
-    })
+    }),
+    new DashboardPlugin(dashboard.setData)
   ],
   externals: {
     jquery: "window.$"

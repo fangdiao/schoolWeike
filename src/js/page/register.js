@@ -10,9 +10,6 @@ const cut_picture = new cutPicture();
 const register_str = require("../../view/register.html");
 //请求路径
 const content_path = require("../components/content_path");
-let weike = JSON.parse(localStorage.getItem("weike"));
-let studentForm = weike;
-let teacherForm = weike;
 (function () {
 var register = {
     //用户类型
@@ -22,7 +19,7 @@ var register = {
     //学生表单存储对象
     student_form:{
       sex: "",
-      image: "",
+      image: "test",
       university: "",
       majorAndGrade: "",
       eduBackgroud: "",
@@ -44,14 +41,15 @@ var register = {
     },
     //初始化
     info:function () {
-      $(".user-name").html(sessionStorage.user_name);
+      var weikeData = JSON.parse(localStorage.weikeData);
+      $(".user-name").html(weikeData.data.username);
       //获取token,提交表单使用
-      var tokenData = localStorage.token;
+      var tokenData = weikeData.data.token
 			var token = "Bearer " + tokenData;
 			//根据localStorage的值获取用户类型,呈现不同的表单
-      this.user_type = sessionStorage.userType;;
+      this.user_type = weikeData.data.role;
       this.token = token;
-      if (this.user_type === "student") {
+      if (this.user_type === "ROLE_STUDENT") {
         $("header").after(register_str);
         $(".teacher").remove();
       } else {
@@ -62,72 +60,86 @@ var register = {
       skill_box.action();
       //删除teacherForm一起引入的user html
       $(".user").remove();
-      //初始化教师的资料
-      $(".teacher img").src = teacherForm.image;
-      $(".teacher input[id='t-name']").val(teacherForm.username);
-      if(teacherForm.sex === "男"){
-      	$(".teacher .sex input[value='男']").attr("checked", true);
-      }else{
-      	$(".teacher .sex input[value='女']").attr("checked", true);
+
+
+
+      let weikeUser = JSON.parse(localStorage.getItem("weikeUser"));
+      let studentForm = weikeUser;
+      let teacherForm = weikeUser;
+
+
+
+      if (weikeUser) {
+        //初始化教师的资料
+        $(".teacher img").src = teacherForm.image;
+        $(".teacher input[id='t-name']").val(teacherForm.username);
+        if(teacherForm.sex === "男"){
+        	$(".teacher .sex input[value='男']").attr("checked", true);
+        }else{
+        	$(".teacher .sex input[value='女']").attr("checked", true);
+        }
+        let rankOption = $(".teacher #t-rank option");
+        let rankOptionLength = rankOption.length;
+        for(let i = 0; i < rankOptionLength; i ++){
+        	if($(".teacher #t-rank option").eq(i).val() === teacherForm.rank){
+        		$(".teacher #t-rank option").eq(i).attr("selected",true);
+        	}
+        }
+        $(".teacher input[id='t-qq']").val(teacherForm.qq);
+
+        //初始化学生的资料
+        $(".student img").src = studentForm.image;
+        $(".student input[id='s-name']").val(studentForm.username);
+        if(studentForm.sex === "男"){
+        	$(".student .sex input[value='男']").attr("checked", true);
+        }else{
+        	$(".student .sex input[value='女']").attr("checked", true);
+        }
+        //学历
+        let eduOption = $(".student #s-edu-background option");
+        let eduOptionLength = eduOption.length;
+        for(let i = 0; i < eduOptionLength; i ++){
+        	if($(".student #s-edu-background option").eq(i).val() === studentForm.edu_background){
+        		$(".student #s-edu-background option").eq(i).attr("selected",true);
+        	}
+        }
+        //专业
+        let majorOption = $(".student #s-major option");
+        let majorOptionLength = majorOption.length;
+        for(let i = 0; i < majorOptionLength; i ++){
+        	if($(".student #s-major option").eq(i).val() === studentForm.major){
+        		$(".student #s-major option").eq(i).attr("selected",true);
+        	}
+        }
+        //入学时间
+        let entryOption = $(".student #s-entry-university option");
+        let entryOptionLength = entryOption.length;
+        for(let i = 0; i < entryOptionLength; i ++){
+        	if($(".student #s-entry-university option").eq(i).val() === studentForm.entry_university){
+        		$(".student #s-entry-university option").eq(i).attr("selected",true);
+        	}
+        }
+        //毕业时间
+        let leaveOption = $(".student #s-leave-university option");
+        let leaveOptionLength = leaveOption.length;
+        for(let i = 0; i < leaveOptionLength; i ++){
+        	if($(".student #s-leave-university option").eq(i).val() === studentForm.leave_university){
+        		$(".student #s-leave-university option").eq(i).attr("selected",true);
+        	}
+        }
+        //技能
+        if (studentForm.skills) {
+          let skillLength = studentForm.skills.length;
+          for(let k = 0; k < skillLength; k ++){
+    				let skills = `<span data-show-skill="${studentForm.skills[k]}">${studentForm.skills[k]}</span>`;
+    				$(".s .skill-show").append(skills);
+    			}
+        }
+        $("textarea[id = 's-experience'").val(studentForm.experience);
+        $(".student input[id='s-qq']").val(studentForm.qq);
+        $("textarea[id = 's-self-feel'").val(studentForm.self_feel);
       }
-      let rankOption = $(".teacher #t-rank option");
-      let rankOptionLength = rankOption.length;
-      for(let i = 0; i < rankOptionLength; i ++){
-      	if($(".teacher #t-rank option").eq(i).val() === teacherForm.rank){
-      		$(".teacher #t-rank option").eq(i).attr("selected",true);
-      	}
-      }
-      $(".teacher input[id='t-qq']").val(teacherForm.qq);
-      
-      //初始化学生的资料
-      $(".student img").src = studentForm.image;
-      $(".student input[id='s-name']").val(studentForm.username);
-      if(studentForm.sex === "男"){
-      	$(".student .sex input[value='男']").attr("checked", true);
-      }else{
-      	$(".student .sex input[value='女']").attr("checked", true);
-      }
-      //学历
-      let eduOption = $(".student #s-edu-background option");
-      let eduOptionLength = eduOption.length;
-      for(let i = 0; i < eduOptionLength; i ++){
-      	if($(".student #s-edu-background option").eq(i).val() === studentForm.edu_background){
-      		$(".student #s-edu-background option").eq(i).attr("selected",true);
-      	}
-      }
-      //专业
-      let majorOption = $(".student #s-major option");
-      let majorOptionLength = majorOption.length;
-      for(let i = 0; i < majorOptionLength; i ++){
-      	if($(".student #s-major option").eq(i).val() === studentForm.major){
-      		$(".student #s-major option").eq(i).attr("selected",true);
-      	}
-      }
-      //入学时间
-      let entryOption = $(".student #s-entry-university option");
-      let entryOptionLength = entryOption.length;
-      for(let i = 0; i < entryOptionLength; i ++){
-      	if($(".student #s-entry-university option").eq(i).val() === studentForm.entry_university){
-      		$(".student #s-entry-university option").eq(i).attr("selected",true);
-      	}
-      }
-      //毕业时间
-      let leaveOption = $(".student #s-leave-university option");
-      let leaveOptionLength = leaveOption.length;
-      for(let i = 0; i < leaveOptionLength; i ++){
-      	if($(".student #s-leave-university option").eq(i).val() === studentForm.leave_university){
-      		$(".student #s-leave-university option").eq(i).attr("selected",true);
-      	}
-      }
-      //技能
-      let skillLength = studentForm.skills.length;
-      for(let k = 0; k < skillLength; k ++){
-				let skills = `<span data-show-skill="${studentForm.skills[k]}">${studentForm.skills[k]}</span>`;
-				$(".s .skill-show").append(skills);
-			}
-      $("textarea[id = 's-experience'").val(studentForm.experience);
-      $(".student input[id='s-qq']").val(studentForm.qq);
-      $("textarea[id = 's-self-feel'").val(studentForm.self_feel);
+
     },
     //错误信息提示
     error: function (ele) {
@@ -173,7 +185,6 @@ var register = {
         this.student_form.leaveUniversity = $("#s-leave-university").val();
         this.student_form.experience = $("#s-experience").val();
         this.student_form.selfFeel = $("#s-self-feel").val();
-        console.log(this.student_form);
         //提交表单
         this.upStudentFrom();
       }
@@ -202,12 +213,11 @@ var register = {
       //我们才会进行其他信息获取,并且提交
       //因为这些信息都是有默认值的选择框,或者是非必填内容
       if (flag) {
-        this.teacher_form.image = $(".user-img > img")[0].src;
+        this.teacher_form.image = 'test';
         this.teacher_form.sex = $("input:radio[name='t-sex']:checked").val();
         this.teacher_form.university = $("#t-university").val();
         this.teacher_form.academy = $("#t-academy").val();
         this.teacher_form.rank = $("#t-rank").val();
-        console.log(this.teacher_form);
         //提交表单
         this.upTeacherForm();
       }
@@ -215,30 +225,51 @@ var register = {
     //提交学生表单
     upStudentFrom:function () {
       var that = this,
-      		form = that.student_form;
-      		console.log(this.token);
+      		form = JSON.stringify(that.student_form),
+          path_stu = '';
+      var token = that.token;
+      if (!localStorage.weikeUser) {
+        path_stu = content_path + '/WeiKe/student/addPersonalDeail';
+      } else {
+        path_stu = content_path + '/WeiKe/student/updateInfo';
+      }
+      console.log(that.token)
       $.ajax({
-        url: content_path + "/WeiKe/student/updateInfo",
-        type: "post",
-        //contentType: "application/json",
-        beforeSend:function(request) {
-					request.setRequestHeader("Authorization", that.token);
-				},
+        url: path_stu,
+        type: "POST",
         data: form,
+        dataType: 'json',
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader('Authorization', token);
+          xhr.setRequestHeader("Content-Type", 'application/json;charset=utf-8');
+        },
+
         success: function (data) {
-          console.log(data);
+          if (data.ifSuccess) {
+            if (localStorage.weikeUser) {
+              alert('个人信息修改成功，返回主页');
+            } else {
+              alert('个人信息填写成功，返回主页');
+            }
+            window.location.href = 'index.html';
+          }
         },
         error: function (data) {
-          console.log(data);
-          console.log(that.student_form)
+          alert('错误');
         }
       });
     },
     //提交老师表单
     upTeacherForm:function () {
       var that = this;
+          path_stu = '';
+      if (!localStorage.weikeUser) {
+        path_stu = content_path + '/WeiKe/teacher/addPersonal';
+      } else {
+        path_stu = content_path + '/WeiKe/teacher/updateInfo';
+      }
       $.ajax({
-        url: content_path + "/WeiKe/teacher/addProject",
+        url: path_stu,
         type: "post",
         contentType: "application/json",
         beforeSend:function(request) {
@@ -246,10 +277,18 @@ var register = {
 				},
         data: JSON.stringify(that.teacher_form),
         success: function (data) {
-          console.log(data);
+          if (data.ifSuccess) {
+            console.log(localStorage.weikeUser)
+            if (localStorage.weikeUser) {
+              alert('个人信息修改成功，返回主页');
+            } else {
+              alert('个人信息填写成功，返回主页');
+            }
+            window.location.href = 'index.html';
+          }
         },
         error: function (data) {
-          console.log(data);
+          alert('错误');
         }
       });
     },
@@ -265,9 +304,9 @@ var register = {
         var target = event.target;
         //提交表单
         if (target.id === "submit") {
-          if (that.user_type === "student") {
+          if (that.user_type === "ROLE_STUDENT") {
             that.getStudentForm();
-          } else if (that.user_type === "teacher") {
+          } else {
             that.getTeacherForm();
           }
         //已选择的技能点击一下就删除且在技能栏内移出激活状态
@@ -291,38 +330,4 @@ var register = {
     }
 };
 register.action();
-
-
-/*  $(".skill-li").on("click",function () {
-    $(this).css("background-color","#F5F5F5").children().css("display","block");
-    $(this).siblings().css("background-color","transparent").children("ul,div").css("display","none");
-});
-$(".select-skill").on("click",function () {
-    if ($(".skill-list").css("display") === "none") {
-      $(".skill-list").slideDown(300);
-    } else {
-      $(".skill-list").slideUp(300);
-    }
-});
-$("span[data-skill]").addClass("active");*/
-
-
-
-/*function imgShow () {
-    var url = null;
-    var file = document.getElementsByClassName("head-img")[0].files[0];
-    if (window.createObjectURL !== undefined) { // basic
-    url = window.createObjectURL(file) ;
-    } else if (window.URL !== undefined) { // mozilla(firefox)
-    url = window.URL.createObjectURL(file) ;
-    } else if (window.webkitURL !==undefined) { // webkit or chrome
-    url = window.webkitURL.createObjectURL(file) ;
-    }
-    $(".user-img").css("background","url(" + url + ") center center no-repeat ");
-}
-$(".head-img").on("blur",function () {
-    if ($(this).val()) {
-      imgShow ();
-    }
-});*/
 })(jQuery);

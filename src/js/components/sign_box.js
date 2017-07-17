@@ -5,7 +5,7 @@ const content_path = require("../components/content_path");
 $("body").append($(sign_box_str));
 
 (function($){
-  
+
   var teacherRegister = false,
       studentRegister = false,
       teacherLogin = false,
@@ -13,13 +13,13 @@ $("body").append($(sign_box_str));
   var emailRE = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;/*测试邮箱*/
   var pwdRE = /^(?![A-Z]+$)(?![a-z]+$)(?!\d+$)(?![\W_]+$)\S{6,16}$/;//匹配密码
   var unameRE = /((?=[\x21-\x7e]+)[^A-Za-z0-9])/;//匹配用户名
-  
+
   function login_register(){};
   login_register.prototype = {
-  	
+
     /*加载时判断是否以前登录时记住密码*/
     login_registerLoad:function(){
-      
+
       if(localStorage.userName && localStorage.password){
         $("#remember").attr("checked", true);
         $('#uname').val(localStorage.userName);
@@ -29,7 +29,7 @@ $("body").append($(sign_box_str));
         $('#uname').val("");
         $('#pwd').val("");
       }
-      
+
       $.ajax({
         type: "GET",
         url: content_path + "/weike/getVerifyCode",
@@ -40,17 +40,17 @@ $("body").append($(sign_box_str));
           if(message){
             $('#canvas').html(message);
             sessionStorage.loginData = message;
-          } 
+          }
         },
         error: function(err){
           alert(err);
         }
       });
     },
-    
+
     /*登录绑定失焦事件*/
     onBlur:function(){
-      
+
       $("body").on('blur','.lo-container',function(event){
         var target = event.target;
         /*用户名输入框失去焦点*/
@@ -64,7 +64,7 @@ $("body").append($(sign_box_str));
             },2000);
           }
         }
-        
+
         /*密码输入框失去焦点*/
         else if(target.id === 'pwd'){
           var pwd = $('#pwd').val();
@@ -76,7 +76,7 @@ $("body").append($(sign_box_str));
             },2000);
           }
         }
-        
+
         /*验证码输入框失去焦点*/
         else if(target.id === 'validate'){
           var validate = $('#validate').val();
@@ -89,11 +89,11 @@ $("body").append($(sign_box_str));
           }
         }
       });
-      
+
       /*注册绑定失焦事件*/
       $("body").on('blur','.re-container',function(event){
         var target = event.target;
-        
+
         /*用户名输入框失去焦点*/
         if(target.id === 're-uname'){
           var uname = $('#re-uname').val();
@@ -110,7 +110,7 @@ $("body").append($(sign_box_str));
             $('.re-p-uname').html('');
           },2000);
         }
-        
+
         /*密码输入框失去焦点*/
         else if(target.id === 're-pwd'){
           var pwd = $('#re-pwd').val();
@@ -133,7 +133,7 @@ $("body").append($(sign_box_str));
             $('.re-p-pwd').html('');
           },2000);
         }
-        
+
         /*邮箱输入框失去焦点*/
         else if(target.id === 're-email'){
           var email = $('#re-email').val();
@@ -151,7 +151,7 @@ $("body").append($(sign_box_str));
             $('.re-p-email').html('');
           },2000);
         }
-        
+
         /*验证码输入框失去焦点*/
         else if(target.id === 're-validate'){
           var validate = $('#re-validate').val();
@@ -165,57 +165,57 @@ $("body").append($(sign_box_str));
         }
       });
     },
-      
+
     onFocus:function(){
-      
+
       /*登录绑定获得焦点事件*/
       $("body").on('focus','.lo-container',function(event){
         var target = event.target;
-        
+
         /*用户名输入框获得焦点*/
         if(target.id === 'uname'){
           $('.p-uname').html("");
         }
-        
+
         /*密码输入框获得焦点*/
         else if(target.id === 'pwd'){
           $('.p-pwd').html("");
         }
-        
+
         /*验证码输入框获得焦点*/
         else if(target.id === 'validate'){
           $('.p-validate').html("");
         }
       });
-    
+
       /*注册绑定获得焦点事件*/
       $("body").on('focus','.re-container',function(event){
         var target = event.target;
-        
+
         /*用户名输入框获得焦点*/
         if(target.id === 're-uname'){
           $('.re-p-uname').html("");
         }
-        
+
         /*密码输入框获得焦点*/
         else if(target.id === 're-pwd'){
           $('.re-p-pwd').html("");
         }
-        
+
         /*邮箱输入框获得焦点*/
         else if(target.id === 're-email'){
           $('.re-p-email').html("");
         }
-        
+
         /*验证码输入框获得焦点*/
         else if(target.id === 're-validate'){
           $('.re-p-validate').html("");
         }
       });
     },
-    
+
     onClick:function(){
-      
+
       /*是否勾选记住密码*/
       if ($('#remember').is(':checked')){
         localStorage.userName = $('#uname').val();
@@ -231,41 +231,41 @@ $("body").append($(sign_box_str));
         $('.lo-container').css({
           'display': 'none'
         });
-        
+
         $('#common-login').css({
           'display': 'none'
         });
-        
+
         $('#common-register').css({
           'display': 'none'
         });
-        
+
         $('#common-forget').css({
           'display': 'none'
         });
-        
+
         $('.forget-validate').css({
           'display': 'block'
         });
-        
+
         $('.forget-pwd').css({
           'display': 'none'
         });
-        
+
         $('#uname').val("");
         $('#pwd').val("");
         $('#validate').val("");
-        
+
         $('.p-uname').html("");
         $('.p-pwd').html("");
         $('.p-validate').html("");
         $('.p-login').html("");
       }
-      
+
       /*选择学生/老师登录绑定click事件*/
       $("body").on('click', '#common-checkLogin', function(event){
         var target = event.target;
-        
+
         $.ajax({
           type: "GET",
           url:  content_path + "/weike/getVerifyCode",
@@ -275,31 +275,31 @@ $("body").append($(sign_box_str));
             if(message){
               $('#canvas').html(message);
               sessionStorage.loginData = message;
-            } 
+            }
           },
           error: function(err){
             alert(err);
           }
         });
-        
+
         /*点击教师\学生登录*/
         if(target.className === 'tea-checkLogin' || target.className === 'stu-checkLogin'){
           $('#common-checkLogin').css({
             'display': 'none'
           });
-          
+
           $('#common-login').css({
             'display': 'block'
           });
-          
+
           $('.lo-container').css({
             'display': 'block'
           });
-          
+
           $('.re-container').css({
             'display': 'none'
-          }); 
-          
+          });
+
           if(target.className === 'tea-checkLogin'){
             teacherLogin = true;
           }
@@ -307,20 +307,20 @@ $("body").append($(sign_box_str));
             studentLogin = true;
           }
         }
-        
+
       });
-      
+
       /*登录绑定click事件*/
       $("body").on('click','.lo-container',function(event){
         var target = event.target;
         /*点击登录界面的关闭按钮*/
         if(target.className === 'out'){
-          
+
           $('#canvas').html("");
-          
+
           _loginNone();
         }
-        
+
         /*点击登录界面的注册按钮*/
         else if(target.className === 'register'){
           $('.lo-container').css({
@@ -330,7 +330,7 @@ $("body").append($(sign_box_str));
             'display': 'block'
           });
         }
-        
+
         /*点击登录界面的忘记密码按钮*/
         else if(target.className === 'unlogin'){
           $('.lo-container').css({
@@ -349,12 +349,12 @@ $("body").append($(sign_box_str));
             'display': 'block'
           });
         }
-        
+
         /*登录时点击获取验证码*/
         else if(target.className === 'reload'){
-          
+
           $('.p-validate').html("");
-          
+
           //登录点击刷新获取验证码发起请求
           $.ajax({
             type: "GET",
@@ -365,14 +365,14 @@ $("body").append($(sign_box_str));
               if(message){
                 $('#canvas').html(message);
                 sessionStorage.loginData = message;
-              } 
+              }
             },
             error: function(err){
               alert(err.tostring());
             }
           });
         }
-        
+
         /*点击登录界面的登录按钮*/
         else if(target.className === 'bt-login'){
 
@@ -383,33 +383,33 @@ $("body").append($(sign_box_str));
           }else if(studentLogin){
             getLoginVerifyCodeUrl = content_path + "/weike/student/login";
           }
-          
+
           //获取登录数据
           var uname = $('#uname').val();
           var pwd = $('#pwd').val();
           var validate = $('#validate').val();
-          
+
           var loginPostData = {
             'username' : uname,
             'password' : pwd
           }
-          
+
           loginPostData = JSON.stringify(loginPostData);
-          
+
           var unamelen = uname.length;
           var pwdlen = pwd.length;
           var validatelen = validate.length;
-          
+
           var loginData = sessionStorage.loginData;
-          
+
           var loginPass = (loginData === validate ? true : false);
-          
+
           if(!loginPass){
             $('p-validate').html('验证码错误');
           }
-          
+
           if(unamelen !==0 && pwdlen !== 0 && validatelen !== 0 && loginPass){
-            
+
           //登录发起请求
           $.ajax({
             type: "POST",
@@ -430,12 +430,12 @@ $("body").append($(sign_box_str));
 				          url: content_path + "/weike/getVerifyCode",
 				          async: false,
 				          success: function(response){
-				            var message = response.msg;
-				            
-				            if(message){
-				              $('#canvas').html(message);
-				              sessionStorage.loginData = message;
-				            } 
+				            // var message = response.msg;
+				            //
+				            // if(message){
+				            //   $('#canvas').html(message);
+				            //   sessionStorage.loginData = message;
+				            // }
 				          },
 				          error: function(err){
 				            alert(err.tostring());
@@ -444,12 +444,11 @@ $("body").append($(sign_box_str));
               }
               /*成功*/
               else if(response.data){
-                localStorage.token = response.data.token;
-                if(teacherLogin){
-			            sessionStorage.userType = "teacher";
-			          }else if(studentLogin){
-			            sessionStorage.userType = "student";
-			          }
+                localStorage.setItem('weikeData',JSON.stringify(response));
+                if (!response.data.isCompleted) {
+                  alert('登录成功，请填写详细资料');
+                  window.location.href = 'register.html';
+                }
                 $('.not-logged').css({
                   'display':'none'
                 });
@@ -463,15 +462,16 @@ $("body").append($(sign_box_str));
                 sessionStorage.user_name = uname;
                 $('.user-name').html(uname);
                 $('#canvas').html("");
-                
+
                 _loginNone();
+                location.reload();
               }
             },
             error: function(err){
               alert(err.toString());
             }
           });
-        } 
+        }
         else{
           $('.p-login').html('验证码错误或信息不全');
             setTimeout(function(){
@@ -480,23 +480,23 @@ $("body").append($(sign_box_str));
           }
         }
       });
-    
+
     /*找回密码界面绑定click事件*/
     $("body").on('click', '#common-forget', function(event){
       var target = event.target;
-      
+
       function _clearPwdFromot(){
         setTimeout(function(){
           $('.forget-pwdPromot').html("");
         },2000);
       }
-      
+
       function _clearFromot(){
         setTimeout(function(){
           $('.forget-promot').html("");
         },2000);
       }
-      
+
       //点击找回密码获取验证码界面的关闭按钮
       if(target.className === 'forget-out'){
         if(typeof forgetTimeInterval !== 'undefined'){
@@ -504,23 +504,23 @@ $("body").append($(sign_box_str));
           $('.forget-reload').removeAttr("disabled");
           $('.forget-reload').val("获取验证码");
         }
-        
+
         $('#forget-uname').val("");
         $('#forget-email').val("");
         $('#forget-getValidate').val("");
-        
+
         _loginNone();
       }
-      
+
       //点击找回密码输入新密码界面的关闭按钮
       else if(target.className === 'forget-pwdOut'){
         $('#forget-uname').val("");
         $('#forget-email').val("");
         $('#forget-getValidate').val("");
-        
+
         _loginNone();
       }
-      
+
       //点击找回密码回去验证码界面的获取验证码按钮
       else if(target.className === 'forget-reload'){
         var forgetUname = $('#forget-uname').val();
@@ -528,21 +528,21 @@ $("body").append($(sign_box_str));
         var forgetEmail = $('#forget-email').val();
         var forgetUnameLength = forgetUname.length;
         var forgetEmailLength = forgetEmail.length;
-        
+
         var forgetFycodeTime = 60;
-        
+
         var forgetPostData = {
           'username':forgetUname,
           'email':forgetEmail
         }
-        
+
         var getForgetVerifyCodeUrl = null;
         if(teacherLogin){
           getForgetVerifyCodeUrl = content_path + "/weike/teacher/getVerifyCodeForFindPassword";
         }else if(studentLogin){
           getForgetVerifyCodeUrl = content_path + "/weike/student/getVerifyCodeForFindPassword";
         }
-        
+
         if(forgetUnameLength === 0){
           $('.forget-promot').html("用户名为空");
           _clearFromot();
@@ -563,7 +563,7 @@ $("body").append($(sign_box_str));
           _getForgetCode();
           _forgetTimeOver();
         }
-        
+
         function _getForgetCode(){
           $.ajax({
             type: "GET",
@@ -583,12 +583,12 @@ $("body").append($(sign_box_str));
             }
           });
         }
-        
+
         //注册获取验证码60秒后重发
         function _forgetTimeOver(){
           forgetTimeInterval = setInterval(function(){
             $('.forget-reload').attr({"disabled":"disabled"});
-  
+
             if(forgetFycodeTime === 1){
               $('.forget-reload').removeAttr("disabled");
               $('.forget-reload').val("获取验证码");
@@ -628,7 +628,7 @@ $("body").append($(sign_box_str));
         }else if(studentLogin){
           getFindVerifyCodeUrl = content_path + "/weike/student/FindPassword";
         }
-        
+
         if(forgetNewPwdLength < 6){
           $('.forget-pwdPromot').html("密码长度过短");
           _clearPwdFromot();
@@ -645,7 +645,7 @@ $("body").append($(sign_box_str));
           $('.forget-pwdPromot').html("前后两次的密码不相同");
           _clearPwdFromot();
         }
-        else{   
+        else{
           var forgetPostNewData = {
             'username' : forgetFindUname,
             'password' : forgetNewPwd
@@ -682,29 +682,29 @@ $("body").append($(sign_box_str));
         }
       }
     });
-    
-    
+
+
     /*选择学生/老师注册绑定click事件*/
     $("body").on('click', '#common-register', function(event){
       var target = event.target;
-      
+
       /*点击教师\学生注册*/
       if(target.className === 'tea-register' || target.className === 'stu-register'){
         $('#common-register').css({
           'display': 'none'
         });
-        
+
         $('#common-login').css({
           'display': 'block'
         });
-        
+
         $('.lo-container').css({
           'display': 'none'
         });
-        
+
         $('.re-container').css({
           'display': 'block'
-        }); 
+        });
         if(target.className === 'tea-register'){
           teacherRegister = true;
         }
@@ -712,82 +712,82 @@ $("body").append($(sign_box_str));
           studentRegister = true;
         }
       }
-      
+
     });
-    
+
     var _registerNone = function(){
       $('.re-container').css({
         'display': 'none'
       });
-      
+
       $('#common-login').css({
         'display': 'none'
       });
-      
+
       $('#common-register').css({
         'display': 'none'
       });
-      
+
       $('#common-forget').css({
         'display': 'none'
       });
-      
+
       $('#re-uname').val("");
       $('#re-pwd').val("");
       $('#re-email').val("");
       $('#re-validate').val("");
-      
+
       $('.re-p-uname').html("");
       $('.re-p-pwd').html("");
       $('.re-p-email').html("");
       $('.re-p-validate').html("");
       $('.re-promot').html("");
     }
-    
+
     /*注册绑定click事件*/
     $("body").on('click','.re-container',function(event){
       var target = event.target;
-      
+
       /*点击注册界面的关闭按钮*/
       if(target.className === 're-out'){
-        
+
         if(typeof timeInterval !== 'undefined'){
           clearInterval(timeInterval);
           $('.re-reload').removeAttr("disabled");
           $('.re-reload').val("获取验证码");
         }
         $('.re-reload').html('获取验证码');
-        
+
         _registerNone();
       }
-      
+
       /*点击注册界面的登录*/
       else if(target.className === 're-bt-login'){
         $('.re-container').css({
           'display': 'none'
         });
-        
+
         $('#common-checkLogin').css({
           'display': 'block'
         });
       }
       /*点击获取注册验证码*/
       else if(target.className === 're-reload'){
-        
+
         $('.re-p-validate').html("");
         var validateUname = $('#re-uname').val();
         var validateEmail = $('#re-email').val();
         var validateUnameLength = validateUname.length;
         var validateEmailLength = validateEmail.length;
-        
+
         var validateData = {
           'username': validateUname,
           'email': validateEmail
         }
-        
+
         var registerFycodeTime = 60;
         var getRegisterVerifyCodeUrl = null;
-        
+
         if(validateUnameLength === 0){
           $('.re-p-validate').html("用户名为空");
         }
@@ -804,15 +804,15 @@ $("body").append($(sign_box_str));
           _getRegister();
           _timeOver();
         }
-        
-        
+
+
         function _getRegister(){
           if(teacherRegister){
             getRegisterVerifyCodeUrl = content_path + "/weike/teacher/GetVerifyCodeForRegister";
           }else if(studentRegister){
             getRegisterVerifyCodeUrl = content_path + "/weike/student/GetVerifyCodeForRegister";
           }
-  
+
           $.ajax({
             type: "GET",
             url: getRegisterVerifyCodeUrl,
@@ -831,12 +831,12 @@ $("body").append($(sign_box_str));
             }
           });
         }
-        
+
         //注册获取验证码60秒后重发
         function _timeOver(){
           timeInterval = setInterval(function(){
             $('.re-reload').attr({"disabled":"disabled"});
-  
+
             if(registerFycodeTime === 1){
               $('.re-reload').removeAttr("disabled");
               $('.re-reload').val("获取验证码");
@@ -848,10 +848,10 @@ $("body").append($(sign_box_str));
           },1000);
         }
       }
-      
+
       /*点击注册页面的注册按钮*/
       else if(target.className === 're-bt-register'){
-        
+
         //点击学生/老师登录确定提交的URL
         var registerUrlData = null;
         if(teacherRegister){
@@ -859,34 +859,34 @@ $("body").append($(sign_box_str));
         }else if(studentRegister){
           registerUrlData = content_path + "/weike/student/register";
         }
-        
+
         var uname = $('#re-uname').val();
         var pwd = $('#re-pwd').val();
         var email = $('#re-email').val();
         var validate = $('#re-validate').val();
-        
+
         var registerPostData = {
           'username' : uname,
           'password' : pwd,
           'email' : email
         };
-        
+
         registerPostData = JSON.stringify(registerPostData);
-        
-        
+
+
         var registerData = sessionStorage.registerData;
-        
+
         var registerPass = (registerData === validate ? true : false);
-        
+
         if(!registerPass){
           $('.re-p-validate').html('验证码错误/为空');
           setTimeout(function(){
           	$('.re-p-validate').html('');
           },2000)
         }
-        
+
         if(!unameRE.test(uname)&&(pwdRE.test(pwd))&&(emailRE.test(email))&&(registerPass)){
-          
+
           //注册发起请求
           $.ajax({
             type: "POST",
@@ -899,7 +899,7 @@ $("body").append($(sign_box_str));
               if(response.ifSuccess){
                 alert('注册成功');
                 $('.re-reload').html('获取验证码');
-        
+
                 _registerNone();
               }else{
                 alert(response.msg);

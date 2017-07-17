@@ -10,17 +10,16 @@ const skill_box_str = require("../../view/skill_box.html");
 const skillBox = require("../components/skill_box.js");
 const skill_box = new skillBox();
 	//token
-let tokenData = localStorage.token;
-let token = "Bearer " + tokenData;
+let token = 'Bearer ' + JSON.parse(localStorage.weikeData).data.token;
   //表单
 let form = {
   projectName: "",
-  projectType: "",
+  projectKind: "",
   projectStart: "",
   projectEnd: "",
   numNeed: "",
   projectNeed: [],
-  projectProfile: "" 
+  projectProfile: ""
 };
 
 const release = {
@@ -34,12 +33,16 @@ const release = {
     this.info();
     this.addEvent();
   },
+  //获取时间
+  getTime: function() {
+    form.projectStart = $('.num-y').eq(0).val() + $('.num-m').eq(0).val() + $('.num-d').eq(0).val();
+    form.projectEnd = $('.num-y').eq(1).val() + $('.num-m').eq(1).val() + $('.num-d').eq(1).val();
+  },
   //获得表单
   getForm:function () {
+    this.getTime();
 		form.projectName = $('input[id="name"]').val();
-		form.projectType = $('input[id="type"]').val();
-		form.projectStart = $('.show-time:first-child').html();
-		form.projectEnd = $('.show-time:eq(1)').html();
+    form.projectType = $('#type').val();
 		form.numNeed = $('.skill-people').val();
 		form.projectProfile = $('#summary').val();
 		var skillShow = $('.skill-show > span');
@@ -53,18 +56,19 @@ const release = {
     var that = this;
     $("body").on("click", ".release", function (event) {
       target = event.target;
-      
-      let userType = sessionStorage.userType;
+
+      let userType = JSON.parse(localStorage.weikeData).data.role;
       let addProjectUrl = null;
-      if(userType === 'teacher'){
-      	addProjectUrl = content_path + "/WeiKe/teacher/addProject";
-      }else if(userType === 'student'){
-      	addProjectUrl = content_path + "/WeiKe/student/addProject";
+      if (userType === 'ROLE_STUDENT'){
+      	 addProjectUrl = content_path + "/WeiKe/student/addProject";
+      } else {
+      	 addProjectUrl = content_path + "/WeiKe/teacher/addProject";
       }
-          
+
       //提交表单
       if(target.id === 'submit'){
       	that.getForm();
+        console.log(form);
       	$.ajax({
     			type: "POST",
           contentType: 'application/json;charset=UTF-8',
@@ -78,6 +82,7 @@ const release = {
           success: function(response){
           	if(response.ifSuccess){
           		alert("项目发布成功");
+              window.location.href = 'index.html';
           	}else{
           		alert("项目已存在" + response.msg);
           	}
